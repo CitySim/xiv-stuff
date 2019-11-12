@@ -1,7 +1,7 @@
 import * as got from "got";
-import { JSDOM } from "jsdom";
-import { cacheString, sleep } from "../util";
+import { cacheString, getDom } from "../util";
 import { Item } from "./types";
+import * as domUtils from "domutils";
 
 export async function main(xivApiItems: Item[]) {
 	let mapped: Item[] = [];
@@ -12,14 +12,19 @@ export async function main(xivApiItems: Item[]) {
 			return res.body;
 		});
 
-		let dom = new JSDOM(html, { runScripts: "outside-only" });
-		let links = dom.window.document.querySelectorAll(".db-table__txt--detail_link");
+		let dom = await getDom(html);
+		let links = domUtils.findAll((e) => {
+			let className = domUtils.getAttributeValue(e, "class") || "";
+			return className.includes("db-table__txt--detail_link");
+		}, dom);
+
 		links.forEach(link => {
 			// grab the name and id
-			let lodestoneName = link.innerHTML
+			let lodestoneName = domUtils.getText(link)
+				.replace(/\u00A0/g, " ")
 				.replace(/&nbsp;/g, " ")
 				.replace(/&amp;/g, "&");
-			let lodestoneId = link.getAttribute("href").split("/")[5];
+			let lodestoneId = domUtils.getAttributeValue(link, "href").split("/")[5];
 			// look for a item
 			let xivApiItem = xivApiItems.find(i => i.name === lodestoneName)
 			if (xivApiItem) {
@@ -32,7 +37,7 @@ export async function main(xivApiItems: Item[]) {
 					lodestoneId: lodestoneId,
 				});
 			} else {
-				console.log(`not found: ${lodestoneId} - ${lodestoneName}`)
+				console.log(`not found: ${lodestoneId} - >${lodestoneName}<`)
 			}
 		})
 

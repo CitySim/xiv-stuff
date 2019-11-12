@@ -22,7 +22,7 @@ export async function main() {
 
 	let items = (JSON.parse(itemsJson) as any[]).map<Item>(item => ({
 		id: item.ID,
-		name: item.Name.replace(/\u00A0/g, " "), // "NO-BREAK SPACE" thanks Craftsman's Singlet
+		name: item.Name.replace(/\u00A0/g, " "),
 	}));
 	console.log(`xivApi items:          ${items.length}`)
 	items = items.filter(item => item.name !== "")

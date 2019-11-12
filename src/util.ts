@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import { promisify } from "util";
+import { Parser } from "htmlparser2";
+import { DomHandler, Node } from "domhandler";
 
 const stat = promisify(fs.stat);
 const readFile = promisify(fs.readFile);
@@ -19,6 +21,21 @@ export async function cacheString(key: string, work: () => Promise<string>): Pro
 			await writeFile(cachePath, value);
 			resolve(value);
 		}
+	});
+}
+
+export async function getDom(html: string): Promise<Node[]> {
+	return new Promise((resolve, reject) => {
+		let handler = new DomHandler((error, dom) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(dom);
+			}
+		});
+		let parser = new Parser(handler);
+		parser.write(html);
+		parser.end();
 	});
 }
 

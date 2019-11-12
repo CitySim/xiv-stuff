@@ -11,6 +11,6 @@ import { writeFileSync } from "fs";
 	console.log("step 3")
 	items = await step3(items);
 
-	writeFileSync("item.json", items);
+	writeFileSync("item.json", JSON.stringify(items));
 	console.log("done")
 })();
