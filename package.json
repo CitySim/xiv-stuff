@@ -8,7 +8,7 @@
     "aigle": "^1.14.1",
     "domhandler": "^3.0.0",
     "domutils": "^2.0.0",
-    "got": "^9.6.0",
+    "got": "^11.8.5",
     "htmlparser2": "^4.0.0"
   },
   "devDependencies": {
